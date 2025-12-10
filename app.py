@@ -34,7 +34,7 @@ class UserInput(BaseModel):
     
     @computed_field
     @property
-    def define_city_tier(city):
+    def define_city_tier(city) -> int:
         if city in tier1_city:
             return 1
         else:
@@ -42,7 +42,7 @@ class UserInput(BaseModel):
 
     @computed_field
     @property
-    def age_group(age):
+    def age_group(age) -> str:
         if age < 25:
             return 'Young'
         elif age < 45:
