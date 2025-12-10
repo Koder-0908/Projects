@@ -25,7 +25,7 @@ class UserInput(BaseModel):
     smoker: Annotated[bool, Field(..., description = 'Is client a smoker?')]
     city: Annotated[str, Field(..., description = 'City of client')]
     occupation: Annotated[Literal['retired', 'freelancer', 'student', 'government_job',
-       'business_owner', 'unemployed', 'private_job'], Field(..., gt = 0, lt = 120, description = 'Age of client')]
+       'business_owner', 'unemployed', 'private_job'], Field(..., description = 'Age of client')]
     
     @computed_field
     @property
@@ -42,15 +42,14 @@ class UserInput(BaseModel):
 
     @computed_field
     @property
-    def age_group(age) -> str:
-        if age < 25:
+    def age_group(self) -> str:
+        if self.age < 25:
             return 'Young'
-        elif age < 45:
+        elif self.age < 45:
             return 'Adult'
-        elif age < 60:
+        elif self.age < 60:
             return 'Middle_aged'
-        else:
-            return 'Senior'
+        return 'Senior'
         
 @app.post('/predict')
 def predict(data: UserInput):
@@ -59,7 +58,8 @@ def predict(data: UserInput):
         'age_group': data.age_group,
         'city_tier': data.define_city_tier,
         'income_lpa': data.income_lpa,
-        'occupation': data.occupation
+        'occupation': data.occupation,
+        'smoker': data.smoker
     }
     input_df = pd.DataFrame([data])
 
