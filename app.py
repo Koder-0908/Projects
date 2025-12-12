@@ -1,10 +1,13 @@
-from pydantic import BaseModel, Field, computed_field
+from pydantic import BaseModel, Field, computed_field, field_validator
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from typing import Literal, Annotated
 import pickle
 import pandas as pd
 import numpy as np
+
+#MLFlow
+MODEL_VERSION = '1.0.0'
 
 tier1_city = ['Jaipur', 'Chennai', 'Mumbai', 'Hyderabad', 'Delhi', 'Chandogarh', 'Kolkata', 'Banglore']
 # import the model
@@ -50,6 +53,23 @@ class UserInput(BaseModel):
         elif self.age < 60:
             return 'Middle_aged'
         return 'Senior'
+    
+    @field_validator('city')
+    @classmethod
+    def normailse(cls, v: str) -> str:
+        v = v.strip().title()
+        return v
+
+
+@app.get('/')
+def home():
+    return {'message': 'Insurance Premium API'}
+
+@app.get('/health')
+def home():
+    return {'Status': 'Ok',
+            'Model': MODEL_VERSION,
+            'Loaded': model is not None}
         
 @app.post('/predict')
 def predict(data: UserInput):
